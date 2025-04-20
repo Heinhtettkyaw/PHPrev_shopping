@@ -42,7 +42,7 @@ else{
           <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title   ">Add Category</h3>
+                    <h3 class="card-title">Add Category</h3>
                 </div>  
               <div class="card-body">
                 <form class="" action="category_add.php" method="post" enctype="multipart/form-data">
@@ -57,7 +57,7 @@ else{
                   </div>
                   <div class="form-group">
                     <input type="submit" class="btn btn-success" name="" value="SUBMIT">
-                    <a href="index.php" class="btn btn-warning">Back</a>
+                    <a href="category.php" class="btn btn-warning">Back</a>
                   </div>
                 </form>
               </div>
