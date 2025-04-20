@@ -47,13 +47,16 @@ if(empty($_POST['name']) || empty($_POST['description']) || empty($_POST['catego
 
 //Insert Into Database
 else{
+    
+
     $name= $_POST['name'];
     $description=$_POST['description'];
     $category_id=$_POST['category_id'];
     $quantity=$_POST['quantity'];
     $price=$_POST['price'];
     $image=$_FILES['image']['name'];
-
+    $file='images/'.($_FILES['image']['name']); 
+    move_uploaded_file($_FILES['image']['tmp_name'], $file);
 
     $stmt= $pdo->prepare("INSERT INTO products (name,description,category_id,quantity,price,image) VALUES (:name,:description,:category_id,:quantity,:price,:image)");
     $results= $stmt->execute([
@@ -63,10 +66,9 @@ else{
       ':quantity' => $quantity, 
       ':price' => $price, 
       ':image' => $image]);
-      if ($results){
-        $file='images/'.($_FILES['image']['name']); 
-        move_uploaded_file($_FILES['image']['tmp_name'], $file);
-      }
+
+       
+      
       
     if ($results){
         echo "<script>alert('Product added successfully!'); window.location.href='../admin/index.php';</script>";
@@ -84,7 +86,7 @@ else{
           <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Add Category</h3>
+                    <h3 class="card-title">Add Product</h3>
                 </div>  
               <div class="card-body">
                 <form class="" action="product_add.php" method="post" enctype="multipart/form-data">

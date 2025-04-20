@@ -1,0 +1,179 @@
+            <?php
+            session_start();
+            require '../config/config.php';
+            require '../config/common.php';
+
+            if (empty($_SESSION['user_id']) && empty($_SESSION['loggged_in'])){
+                header('Location: login.php');
+            }
+
+            if($_SESSION['role']!=1){
+                header('Location: login.php');
+            }
+            // validation
+            if ($_POST){
+            if(empty($_POST['name']) || empty($_POST['description']) || empty($_POST['category_id']) ||
+            empty($_POST['quantity']) || empty($_POST['price']) || empty($_FILES['image']['name'])){
+                if (empty($_POST['name'])){
+                    $nameError= 'Category name is required';
+                }
+                if (empty($_POST['description'])){
+                    $descError= 'Category description is required';
+                }
+                if (empty($_POST['category_id'])){
+                    $catError= 'Category is required';
+                }
+                if (empty($_POST['quantity'])){
+                    $qtyError= 'Quantity is required';
+                }elseif ($_POST['quantity'] < 0 || (is_numeric($_POST['quantity'])!=1)){
+                    $qtyError= 'Quantity must be greater than 0 and a number';
+                }
+                if (empty($_POST['price'])){
+                    $priceError= 'Price is required';
+                } elseif ($_POST['price'] < 0 || (is_numeric($_POST['price'])!=1)){
+                    $priceError= 'Price must be greater than 0 and a number';
+                }
+                
+                
+            }else
+            {   
+                if(!empty($_FILES['image']['name'])){   
+                    // If image is uploaded
+                    $file='images/'.($_FILES['image']['name']);
+                    $fileType= pathinfo($file,PATHINFO_EXTENSION);
+                    if ($fileType != 'jpg' && $fileType != 'png' && $fileType != 'jpeg'){
+                        $imgError= 'Image must be jpg, png or jpeg';
+                }else{
+                    $name= $_POST['name'];
+                    $description=$_POST['description'];
+                    $category_id=$_POST['category_id'];
+                    $quantity=$_POST['quantity'];
+                    $price=$_POST['price'];
+                    $image=$_FILES['image']['name'];
+                    move_uploaded_file($_FILES['image']['tmp_name'], $file);
+                
+                    $stmt= $pdo->prepare("UPDATE products SET name=:name, description=:description, category_id=:category_id, quantity=:quantity, price=:price, image=:image WHERE id=:id");
+                    $results= $stmt->execute([
+                    ':name' => $name, 
+                    ':description' => $description,
+                    ':category_id' => $category_id,
+                    ':quantity' => $quantity, 
+                    ':price' => $price, 
+                    ':image' => $image,
+                    ':id' => $_POST['id'],
+                    ]);
+                    //success message
+                    if ($results){
+                        echo "<script>alert('Product updated successfully!'); window.location.href='../admin/index.php';</script>";
+                    }
+                }
+                }
+                else{
+                // If image is not uploaded
+                echo("Image is not uploaded");
+                exit();
+                $id= $_POST['id'];
+                $name= $_POST['name'];
+                $description=$_POST['description'];
+                $category_id=$_POST['category_id'];
+                $quantity=$_POST['quantity'];
+                $price=$_POST['price'];
+                
+                $stmt= $pdo->prepare("UPDATE products SET name=:name, description=:description, category_id=:category_id, quantity=:quantity, price=:price WHERE id=:id");
+                $results= $stmt->execute([
+                ':name' => $name, 
+                ':description' => $description,
+                ':category_id' => $category_id,
+                ':quantity' => $quantity, 
+                ':price' => $price, 
+                ':id' => $id,
+                ]);
+                
+                //success message
+                if ($results){
+                    echo "<script>alert('Product updated successfully!'); window.location.href='../admin/index.php';</script>";
+                }
+                }
+            }
+            }
+
+            ?>
+
+            <?php include('header.php'); ?>
+                <!-- Main content --> 
+                <div class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Edit Category</h3>
+                            </div>  
+                        <div class="card-body">
+                            <?php
+                                $pid= $_GET['id'];
+                                $pstmt= $pdo->prepare("SELECT * FROM products WHERE id=:id");
+                                $pstmt->execute([':id' => $pid]);
+                                $p_result= $pstmt->fetch(); 
+                                ?>
+                            <form class="" action="product_edit.php" method="post" enctype="multipart/form-data">
+                            <input name="_token" type="hidden" value="<?php echo $_SESSION['_token'];?>"> 
+                            <input type="hidden" name="id" value="<?php echo $p_result['id']?>">
+                            <div class="form-group">
+                                <label for="">Name</label><p style="color:red"><?php echo empty($nameError) ? '' : '*'.$nameError; ?></p>
+                                <input type="text" class="form-control" name="name" value="<?php echo $p_result['name']; ?>">
+                            </div>
+                            <div class="form-group">
+                                <label for="">Description</label><p style="color:red"><?php echo empty($descError) ? '' : '*'.$descError; ?></p>
+                                <textarea class="form-control" name="description" rows="8" cols="80"><?php echo $p_result['description']; ?></textarea>
+                            </div>
+                            <div class="form-group">
+                            <label for="">Category</label><p style="color:red"><?php echo empty($catError) ? '' : '*'.$catError; ?></p>
+                            <select class="form-control" name="category_id">
+                                <option value="">Select Category</option>
+                                <?php
+                                $stmt = $pdo->prepare("SELECT * FROM categories");
+                                $stmt->execute();
+                                $results = $stmt->fetchAll();
+                                if ($results) {
+                                    foreach ($results as $result) {
+                                    //   echo '<option value="'.$result['id'].'">'.$result['name'].'</option>';
+                                    if($result['id']== $p_result['category_id']){
+                                        echo '<option value="'.$result['id'].'" selected>'.$result['name'].'</option>';
+                                    } else {
+                                        echo '<option value="'.$result['id'].'">'.$result['name'].'</option>';
+                                    }   
+                                    }
+                                }
+                                ?> 
+                            </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="">Quantity</label><p style="color:red"><?php echo empty($qtyError) ? '' : '*'.$qtyError; ?></p>
+                                <input type="number" class="form-control" name="quantity" value="<?php echo $p_result['quantity']; ?>">
+                            </div>
+                            <div class="form-group">
+                                <label for="">Price</label><p style="color:red"><?php echo empty($priceError) ? '' : '*'.$priceError; ?></p>    
+                                <input type="number" class="form-control" name="price" value="<?php echo $p_result['price']; ?>">
+                            </div>
+                            <div class="form-group">
+                            
+                                <img src="images/<?php echo $p_result['image']; ?>" alt="" width="150px" height="150px"><br>
+                                <label for="">Product Image</label><p style="color:red"><?php echo empty($imgError) ? '' : '*'.$imgError; ?></p>
+                                <input type="file" class="form-control" name="image" value="">
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" class="btn btn-success" name="" value="SUBMIT">
+                                <a href="index.php" class="btn btn-warning">Back</a>
+                            </div>
+                            </form>
+                        </div>
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    </div>
+                    <!-- /.row -->
+                </div><!-- /.container-fluid -->
+                </div>
+                <!-- /.content -->
+            <?php include('footer.html')?>
