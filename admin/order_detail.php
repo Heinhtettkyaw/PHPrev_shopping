@@ -44,48 +44,49 @@
                 <div class="card-body">
                     
                     <br>
-                    <table class="table table-bordered">   
-                    <thead class="thead-light"> 
-                        <tr>
-                       
-                        <th>Order ID</th>
-                        <th>Customer Name</th>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Total Price</th>
-                        <th>Order Date</th>
-                        
-                        </tr>
-                    </thead>
-                    <tbody>
-                    
-                        
+                   <a href="order.php" class="btn btn-primary">Back</a>
+                   <br><br> 
+                    <table class="table table-bordered">
+                        <tbody>
                             <tr>
-                            <td><?php echo escape($orderResult['id']); ?></td>
-                            <td>
-                                <?php 
-                                $userStmt=$pdo->prepare ("SELECT * FROM users WHERE id=".$orderResult['user_id']);
-                                $userStmt->execute();
-                                $userResult=$userStmt->fetch();
-                                echo escape($userResult['name']);
-                                ?>
-                            </td>
-                            <td>
-                                <?php 
-                                $productStmt=$pdo->prepare ("SELECT * FROM products WHERE id=".$result['product_id']);
-                                $productStmt->execute();
-                                $productResult=$productStmt->fetch();
-                                echo escape($productResult['name']);
-                                ?>
-                            </td>
-                            <td><?php echo escape($result['quantity'])?></td>
-                            <td><?php echo escape($orderResult['total_price'])?></td>
-                            <td><?php echo escape($result['order_date'])?></td>
-                        
-                            </tr>   
-                       
-                        
-                    </tbody>
+                                <th>Order ID</th>
+                                <td><?php echo escape($orderResult['id']); ?></td>
+                            </tr>
+                            <tr>
+                                <th>Customer Name</th>
+                                <td>
+                                    <?php 
+                                    $userStmt = $pdo->prepare("SELECT * FROM users WHERE id=".$orderResult['user_id']);
+                                    $userStmt->execute();
+                                    $userResult = $userStmt->fetch();
+                                    echo escape($userResult['name']);
+                                    ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Product</th>
+                                <td>
+                                    <?php 
+                                    $productStmt = $pdo->prepare("SELECT * FROM products WHERE id=".$result['product_id']);
+                                    $productStmt->execute();
+                                    $productResult = $productStmt->fetch();
+                                    echo escape($productResult['name']);
+                                    ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Quantity</th>
+                                <td><?php echo escape($result['quantity']); ?></td>
+                            </tr>
+                            <tr>
+                                <th>Total Price</th>
+                                <td><?php echo escape($orderResult['total_price']); ?></td>
+                            </tr>
+                            <tr>
+                                <th>Order Date</th>
+                                <td><?php echo escape($result['order_date']); ?></td>
+                            </tr>
+                        </tbody>
                     </table>
                     
                    
@@ -101,4 +102,3 @@
         </div>
         <!-- /.content -->
     <?php include('footer.html')?>
- 

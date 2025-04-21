@@ -1,8 +1,4 @@
 <!DOCTYPE html>
-<!--
-This is a starter template page. Use this page to start your new project from
-scratch. This page gets rid of all links and provides the needed markup only.
--->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -36,7 +32,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         $link_array = explode('/',$link);
         $page = end($link_array);
     ?>
-
+<?php if($page!= 'order.php' && $page!='order_detail.php'){ ?>
     <form class="form-inline ml-3" method="post" <?php switch($page){
         case 'index.php':
             echo 'action="index.php"';
@@ -61,7 +57,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         </div>
       </div>
     </form>
-
+<?php } ?>
 
   </nav>
   <!-- /.navbar -->
